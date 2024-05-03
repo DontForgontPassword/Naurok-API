@@ -25,7 +25,7 @@ async function get_test_session(Session) {
     }
 }
 
-async function get_session_from_test(html) {
+async function get_session_token_from_test(html) {
     const $ = cheerio.load(html);
     const session_not_parsed = $('div[ng-app="testik"]').attr("ng-init");
     const session_parsed = session_not_parsed.split(",")[1];
