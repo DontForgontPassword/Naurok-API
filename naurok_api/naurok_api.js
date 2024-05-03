@@ -26,42 +26,29 @@ async function get_test_session(Session) {
 }
 
 async function get_session_from_test(html) {
-    try {
-        const $ = cheerio.load(html);
-        const session_not_parsed = $('div[ng-app="testik"]').attr("ng-init");
-        const session_parsed = session_not_parsed.split(",")[1];
-        return session_parsed;
-    } catch (error) {
-        throw new Error('Error parsing HTML:', error);
-    }
+    const $ = cheerio.load(html);
+    const session_not_parsed = $('div[ng-app="testik"]').attr("ng-init");
+    const session_parsed = session_not_parsed.split(",")[1];
+    return session_parsed;
 }
 
 async function join_test_game(ID, Name) {
-    try {
-        const response = await axios.get(`https://naurok.com.ua/test/join?gamecode=${ID}`);
-        const html = response.data;
-        const $ = cheerio.load(html);
+    const response = await axios.get(`https://naurok.com.ua/test/join?gamecode=${ID}`);
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-        const csrfToken = $('meta[name="csrf-token"]').attr("content");
-        if (!csrfToken) {
-            console.error("CSRF token not found in the response");
-            return;
+    const csrf = $('meta[name="csrf-token"]').attr("content");
+
+    const formData = new FormData();
+    formData.append('_csrf', csrf);
+    formData.append('JoinForm[gamecode]', ID);
+    formData.append('JoinForm[name]', Name);
+
+    const joinResponse = await axios.post(`https://naurok.com.ua/test/join`, formData, {
+        headers: {
+            'Cookie': response.headers['set-cookie']
         }
-
-        const formData = new FormData();
-        formData.append('_csrf', csrfToken);
-        formData.append('JoinForm[gamecode]', ID);
-        formData.append('JoinForm[name]', Name);
-
-        const joinResponse = await axios.post(`https://naurok.com.ua/test/join`, formData, {
-            headers: {
-                'Cookie': response.headers['set-cookie']
-            }
-        });
-        return await joinResponse.data
-    } catch (error) {
-        console.error("Error:", error.message);
-    }
+    });
 }
 
 async function set_test_answer(sessionId, answerId, questionId, point, homework) {
@@ -108,13 +95,6 @@ async function end_test_session(Session) {
         "mode": "cors",
         "credentials": "include"
     });
-}
-
-async function get_captcha_key(html)
-{
-    const $ = cheerio.load(html)
-    const captcha_key = $('input[id="sessionform-recaptcha"]').attr("value")
-    return captcha_key
 }
 
 async function get_test_answers()
