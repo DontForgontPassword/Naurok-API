@@ -97,11 +97,6 @@ async function end_test_session(Session) {
     });
 }
 
-async function get_test_answers()
-{
-
-}
-
 module.exports = {
     get_test_session, join_test_game, set_test_answer, get_session_from_test, end_test_session
 }
