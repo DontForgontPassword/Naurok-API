@@ -1,4 +1,3 @@
-
 const cheerio = require("cheerio")
 const axios = require("axios")
 
@@ -25,7 +24,7 @@ async function get_test_session(Session) {
     }
 }
 
-async function get_session_token_from_test(html) {
+function get_session_token_from_test(html) {
     const $ = cheerio.load(html);
     const session_not_parsed = $('div[ng-app="testik"]').attr("ng-init");
     const session_parsed = session_not_parsed.split(",")[1];
@@ -76,8 +75,8 @@ async function set_test_answer(sessionId, answerId, questionId, point, homework)
     return data
 }
 
-async function end_test_session(Session) {
-    const response = await fetch(`https://naurok.com.ua/api2/test/sessions/end/${Session}`, {
+function end_test_session(Session) {
+    fetch(`https://naurok.com.ua/api2/test/sessions/end/${Session}`, {
         "headers": {
             "accept": "application/json, text/plain, */*",
             "accept-language": "en-US,en;q=0.9,ru;q=0.8",
@@ -98,5 +97,5 @@ async function end_test_session(Session) {
 }
 
 module.exports = {
-    get_test_session, join_test_game, set_test_answer, get_session_from_test, end_test_session
+    get_test_session, join_test_game, set_test_answer, get_session_token_from_test, end_test_session
 }
